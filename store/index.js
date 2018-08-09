@@ -1,14 +1,16 @@
 export const state = () => ({
-  coinList: null,
-  coinName: null,
-  coinData: null,
+  coinList: null, // ['BTC', 'ETH', ...]
+  coinName: null, // 'BTC' etc.
+  coinData: null, // [{ time: '', highBid: ... }, ...]
 });
 
 export const getters = {
   currentValue(state) {
+    // 選択中コインの現在値を算出
     return state.coinData[state.coinData.length - 1].closeBid;
   },
   chartOptions(state, getters) {
+    // coinDataに変更があればグラフのオプションも自動で再生成
     return {
       chart: {
         type: 'line',
@@ -22,17 +24,17 @@ export const getters = {
       },
       series: [{
         name: '現在値',
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 125]
+        data: state.coinData.map(data => data.closeBid),
       }, {
         name: '高値',
-        data: [35, 40, 55, 50, 49, 70, 70, 91, 125]
+        data: state.coinData.map(data => data.highBid),
       }, {
         name: '安値',
-        data: [35, 80, 55, 80, 49, 80, 70, 91, 125]
+        data: state.coinData.map(data => data.lowBid),
       }],
       xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
-      }
+        categories: state.coinData.map(data => data.time),
+      },
     };
   },
 };
@@ -47,8 +49,24 @@ export const mutations = {
   setCoinData(state, data) {
     state.coinData = data;
   },
+  addCoinData(state, singleData) {
+    if (state.coinData[state.coinData.length - 1].time === singleData.time) {
+      // 時刻が同じなら末尾の連想配列を差し替える
+      const newCoinData = [...state.coinData];
+      newCoinData[newCoinData.length -1] = singleData;
+      state.coinData = newCoinData;
+    } else {
+      // 時刻が更新されたら末尾に追加して先頭を削除する
+      state.coinData = [...state.coinData, singleData].slice(1);
+    }
+  },
 };
 
+// 非同期でstateを変えたい場合はactionsの中でcommit
+// nuxt.config.jsのaxios.baseURLが自動付加されてリクエスト
+
+/* $axios.「$」getはnuxt.js独自のaxios拡張メソッド
+   https://axios.nuxtjs.org/usage.html */
 export const actions = {
   async getCoinList({ commit }) {
     const list = await this.$axios.$get('/api/coins');

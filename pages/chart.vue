@@ -1,6 +1,5 @@
 <template>
   <div>
-    <div class="background"/>
     <b-jumbotron
       :fluid="true"
       :header="`${$store.state.coinName} / JPY - ${$store.getters.currentValue}`"
@@ -9,19 +8,27 @@
       bg-variant="transparent"
     >
       <p>For more information visit website</p>
-      <b-btn variant="primary" href="#">More Info</b-btn>
+      <nuxt-link to="/">
+        <b-btn variant="primary">
+          <!-- fasはfontawesameのアイコン
+          https://fontawesome.com/icons/home?style=solid -->
+          <i class="fas fa-home"/> Home
+        </b-btn>
+      </nuxt-link>
     </b-jumbotron>
 
     <b-container>
-      <LineChart :options="$store.getters.chartOptions"/>
+      <line-chart :options="$store.getters.chartOptions"/>
     </b-container>
   </div>
 </template>
 
 <script>
 import bJumbotron from 'bootstrap-vue/es/components/jumbotron/jumbotron';
+// https://bootstrap-vue.js.org/docs/components/layout
 import bContainer from 'bootstrap-vue/es/components/layout/container';
 import LineChart from '@/components/LineChart';
+import io from 'socket.io-client';
 
 export default {
   components: {
@@ -29,23 +36,35 @@ export default {
     bContainer,
     LineChart,
   },
-  async fetch({ store, route }) {
+  async fetch({ store, redirect, route }) {
     const coinName = route.query.name;
-    store.commit('setCoinName', coinName);
-    await store.dispatch('getCoinData');
+    if (coinName) {
+      store.commit('setCoinName', coinName);
+      await store.dispatch('getCoinData');
+    } else {
+      // クエリが無効な場合トップページに飛ばす
+      redirect('/');
+    }
+  },
+  // nuxt.js独自の非同期dataメソッド
+  // https://ja.nuxtjs.org/guide/async-data
+  asyncData({ store, app }, callback) {
+    // 今回はaxiosと同じサーバーなのでURLを共有、通常は環境変数(process.env)を使う
+    const socket = io(app.$axios.defaults.baseURL);
+    socket.on('connect', () => {
+      // join/messageという文字列はsocketサーバー開発者の命名に依存する
+      socket.emit('join', store.state.coinName);
+      socket.on('message', ({ data }) => store.commit('addCoinData', data));
+
+      callback(null, {
+        socket,
+      });
+    });
+  },
+  // ページを離れた直後に呼ばれる
+  destroyed() {
+    // setIntervalなどコンポーネント内で継続している処理はここで全て停止させる
+    this.socket.close();
   },
 }
 </script>
-
-<style scoped>
-.background {
-  background: center/cover url(~/assets/background.jpg);
-  position: fixed;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-}
-</style>

@@ -1,8 +1,23 @@
 <template>
   <div>
+    <div class="background"/>
+    <!-- nuxtタグはページコンポーネントが挿入される -->
     <nuxt/>
   </div>
 </template>
+
+<style scoped>
+.background {
+  background: center/cover url(~/assets/background.jpg);
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+</style>
 
 <style>
 html

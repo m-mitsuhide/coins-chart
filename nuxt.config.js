@@ -6,6 +6,7 @@ module.exports = {
   /*
   ** Headers of the page
   */
+  // head タグ内に埋め込みたいタグをプロパティ名で指定。scriptもOK
   head: {
     title: pkg.name,
     meta: [
@@ -14,7 +15,8 @@ module.exports = {
       { hid: 'description', name: 'description', content: pkg.description }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.1.0/css/all.css' },
     ]
   },
 
@@ -49,6 +51,7 @@ module.exports = {
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
+    // axios使う際のURL先頭に付加される
     baseURL: 'https://cryptcoin.now.sh',
   },
 
@@ -59,7 +62,8 @@ module.exports = {
     /*
     ** You can extend webpack config here
     */
-    vendor: ['apexcharts'],
+    // ブラウザで動かしたいnpmモジュール名を登録し、2重読み込みを防ぐ
+    vendor: ['socket.io-client', 'apexcharts'],
     extend(config, ctx) {
       
     }

@@ -1,59 +1,45 @@
 <template>
-  <section class="container">
-    <div>
-      <logo/>
-      <h1 class="title">
-        crypto-coin
-      </h1>
-      <h2 class="subtitle">
-        My bedazzling Nuxt.js project
-      </h2>
-      <div class="links">
-        <a href="https://nuxtjs.org/" target="_blank" class="button--green">Documentation</a>
-        <a href="https://github.com/nuxt/nuxt.js" target="_blank" class="button--grey">GitHub</a>
-      </div>
-    </div>
-  </section>
+  <div>
+    <b-jumbotron
+      :fluid="true"
+      header="Vue Crypto Coins"
+      lead="Bootstrap 4 Components for Vue.js 2"
+      text-variant="white"
+      bg-variant="transparent"
+    >
+      <p>For more information visit website</p>
+
+      <!-- nuxt-linkの実体はaタグ、toはhref相当 -->
+      <nuxt-link
+        v-for="name in $store.state.coinList"
+        :key="name"
+        :to="`/chart/?name=${name}`"
+        class="coin-btn"
+      >
+        <b-btn variant="primary">{{ name }} / JPY</b-btn>
+      </nuxt-link>
+    </b-jumbotron>
+  </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
+// https://bootstrap-vue.js.org/docs/components/jumbotron
+import bJumbotron from 'bootstrap-vue/es/components/jumbotron/jumbotron';
 
 export default {
   components: {
-    Logo
-  }
+    bJumbotron,
+  },
+  // fetchはページレンダリングに必要なstateを最初に取得するためのnuxt.js固有メソッド
+  // https://ja.nuxtjs.org/api/pages-fetch/
+  async fetch({ store }) {
+    await store.dispatch('getCoinList');
+  },
 }
 </script>
 
-<style>
-.container
-{
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-.title
-{
-  font-family: "Quicksand", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* 1 */
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-.subtitle
-{
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-.links
-{
-  padding-top: 15px;
+<style scoped>
+.coin-btn {
+  margin-right: 15px;
 }
 </style>

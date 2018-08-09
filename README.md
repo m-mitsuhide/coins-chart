@@ -1,22 +1,12 @@
-# crypto-coin
+## インストール手順
 
-> My bedazzling Nuxt.js project
-
-## Build Setup
-
-``` bash
-# install dependencies
-$ yarn install
-
-# serve with hot reload at localhost:3000
-$ yarn run dev
-
-# build for production and launch server
-$ yarn run build
-$ yarn start
-
-# generate static project
-$ yarn run generate
+```bash
+$ git clone https://github.com/m-mitsuhide/coins-chart.git
+$ cd coins-chart
+$ npm i
+$ npm run dev
 ```
 
-For detailed explanation on how things work, checkout [Nuxt.js docs](https://nuxtjs.org).
+http://localhost:3000/  
+を開く  
+(http://127.0.0.1:3000だとChromeで動かない)
